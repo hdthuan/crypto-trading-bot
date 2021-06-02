@@ -6,7 +6,7 @@ module.exports = class ClosedPositionHttp {
   }
 
   async getClosedPositionsPageVariables(request, response) {
-    let includeSymbols = request.query.include_symbold || [];
+    let includeSymbols = request.query.include_symbols || [];
     let limit = 200
 
     if(request.query.limit) {
@@ -14,7 +14,7 @@ module.exports = class ClosedPositionHttp {
     }
 
     return {
-      logs: await this.closedPositionRepository.getLatestClosedPositions(includeSymbols, limit),
+      closedPositions: await this.closedPositionRepository.getLatestClosedPositions(includeSymbols, limit),
       symbols: await this.closedPositionRepository.getSymbols(),
       form: {
         includeSymbols: includeSymbols

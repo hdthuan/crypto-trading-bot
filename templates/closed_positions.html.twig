@@ -71,8 +71,9 @@
                                                 <td>{{closedPosition.side}}</td>
                                                 <td>{{closedPosition.amount|price_format}}</td>
                                                 <td>{{closedPosition.entry|price_format}}</td>
-                                                <td>{{closedPosition.profit}}</td>
-                                                <td>{{closedPosition.profit}}</td>
+                                                <td>
+                                                    <span class="{{ closedPosition.profit >= 0 ? 'text-success' : 'text-danger' }}">{{ closedPosition.profit|round(2) }} %</span>
+                                                </td>
                                                 <td style="white-space: nowrap">{{ closedPosition.created_at|date('y-m-d H:i:s') }}</td>
                                                 <td style="white-space: nowrap">{{ closedPosition.closed_at|date('y-m-d H:i:s') }}</td>
                                             </tr>
