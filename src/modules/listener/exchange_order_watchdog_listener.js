@@ -321,7 +321,7 @@ module.exports = class ExchangeOrderWatchdogListener {
       config.stop_percent < 0.1 ||
       config.stop_percent > 50
     ) {
-      this.logger.error('Stoploss Watcher: invalid stop configuration need "0.1" - "50"');
+      this.logger.error('Trailing Stoploss Watcher: invalid stop configuration need "0.1" - "50"');
       return;
     }
 

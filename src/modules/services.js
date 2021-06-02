@@ -45,6 +45,8 @@ const TechnicalAnalysisValidator = require('../utils/technical_analysis_validato
 const WinstonSqliteTransport = require('../utils/winston_sqlite_transport');
 const LogsHttp = require('./system/logs_http');
 const LogsRepository = require('../modules/repository/logs_repository');
+const ClosedPositionHttp = require('./system/closed_position_http');
+const ClosedPositionRepository = require('../modules/repository/closed_position_repository');
 const TickerLogRepository = require('../modules/repository/ticker_log_repository');
 const TickerRepository = require('../modules/repository/ticker_repository');
 const CandlestickResample = require('../modules/system/candlestick_resample');
@@ -107,6 +109,8 @@ let systemUtil;
 let technicalAnalysisValidator;
 let logsHttp;
 let logsRepository;
+let closedPositionHttp;
+let closedPositionRepository;
 let tickerLogRepository;
 let candlestickResample;
 let exchanges;
@@ -369,6 +373,7 @@ module.exports = {
       this.getExchangeManager(),
       this.getHttpPairs(),
       this.getLogsHttp(),
+      this.getClosedPositionHttp(),
       this.getCandleExportHttp(),
       this.getCandleImporter(),
       this.getOrdersHttp(),
@@ -489,12 +494,28 @@ module.exports = {
     return (logsRepository = new LogsRepository(this.getDatabase()));
   },
 
+  getClosedPositionRepository: function(){
+    if (closedPositionRepository) {
+      return closedPositionRepository;
+    }
+
+    return closedPositionRepository = new ClosedPositionRepository(this.getDatabase());
+  },
+
   getLogsHttp: function() {
     if (logsHttp) {
       return logsHttp;
     }
 
     return (logsHttp = new LogsHttp(this.getLogsRepository()));
+  },
+
+  getClosedPositionHttp: function() {
+    if (closedPositionHttp) {
+      return closedPositionHttp;
+    }
+
+    return (closedPositionHttp = new ClosedPositionHttp(this.getClosedPositionRepository()));
   },
 
   getTickerLogRepository: function() {
@@ -679,6 +700,7 @@ module.exports = {
       this.getTickerLogRepository(),
       this.getExchangePositionWatcher(),
       this.getPairStateManager(),
+      this.getClosedPositionRepository()
     );
   },
 

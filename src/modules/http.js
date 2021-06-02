@@ -16,6 +16,7 @@ module.exports = class Http {
     exchangeManager,
     pairsHttp,
     logsHttp,
+    closedPositionHttp,
     candleExportHttp,
     candleImporter,
     ordersHttp,
@@ -34,6 +35,7 @@ module.exports = class Http {
     this.ordersHttp = ordersHttp;
     this.projectDir = projectDir;
     this.tickers = tickers;
+    this.closedPositionHttp = closedPositionHttp;
   }
 
   start() {
@@ -196,6 +198,10 @@ module.exports = class Http {
 
     app.get('/logs', async (req, res) => {
       res.render('../templates/logs.html.twig', await this.logsHttp.getLogsPageVariables(req, res));
+    });
+
+    app.get('/closed-positions', async (req, res) => {
+      res.render('../templates/closed_positions.html.twig', await this.closedPositionHttp.getClosedPositionsPageVariables(req, res));
     });
 
     app.get('/desks/:desk', async (req, res) => {
