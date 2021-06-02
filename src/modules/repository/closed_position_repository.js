@@ -5,8 +5,8 @@ module.exports = class ClosedPositionRepository {
 
   insertClosedPosition(exchange, position) {
     const stmt = this.db.prepare(
-      'INSERT INTO closed_position'+
-      '(exchange, symbol, side, amount, entry, profit, created_at, closed_at) '+
+      'INSERT INTO closed_positions'+
+      '(exchange, symbol, side, amount, [entry], profit, created_at, closed_at) '+
       'VALUES ($exchange, $symbol, $side, $amount, $entry, $profit, $createdAt, $closedAt)'
     );
 
@@ -17,8 +17,8 @@ module.exports = class ClosedPositionRepository {
       amount: position.getAmount(),
       entry: position.getEntry(),
       profit: position.getProfit(),
-      createdAt: position.getCreatedAt(),
-      closedAt: new Date(),
+      createdAt: position.getCreatedAt().getTime(),
+      closedAt: new Date().getTime(),
     });
   }
 
