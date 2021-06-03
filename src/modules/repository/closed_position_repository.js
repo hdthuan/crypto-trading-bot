@@ -29,7 +29,7 @@ module.exports = class ClosedPositionRepository {
       const parameters = {};
 
       if (includes.length > 0) {
-        sql = `SELECT * from logs WHERE symbol IN (${includes
+        sql = `SELECT * from closed_positions WHERE symbol IN (${includes
           .map((_, index) => `$symbol_${index}`)
           .join(', ')}) order by created_at DESC LIMIT ${limit}`;
 
