@@ -5,7 +5,7 @@ module.exports = class ClosedPositionHttp {
     this.closedPositionRepository = closedPositionRepository;
   }
 
-  async getClosedPositionsPageVariables(request, response) {
+  async getClosedPositionsPageVariables(request) {
     let includeSymbols = request.query.include_symbols || [];
     let limit = 200
 
