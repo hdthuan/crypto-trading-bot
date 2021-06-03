@@ -19,7 +19,6 @@ module.exports = class Trade {
     tickerLogRepository,
     exchangePositionWatcher,
     pairStateManager,
-    closedPositionRepository,
   ) {
     this.eventEmitter = eventEmitter;
     this.instances = instances;
@@ -35,7 +34,6 @@ module.exports = class Trade {
     this.tickerLogRepository = tickerLogRepository;
     this.exchangePositionWatcher = exchangePositionWatcher;
     this.pairStateManager = pairStateManager;
-    this.closedPositionRepository = closedPositionRepository;
   }
 
   start() {
@@ -121,13 +119,6 @@ module.exports = class Trade {
     });
 
     eventEmitter.on(PositionStateChangeEvent.EVENT_NAME, async event => {
-      if (event.isClosed()) {
-        try {
-          await me.closedPositionRepository.insertClosedPosition(event.getExchange(), event.getPosition())
-        } catch (e) {
-          me.logger.error('insertClosedPosition' + String(e));
-        }
-      }
       await me.exchangeOrderWatchdogListener.onPositionChanged(event);
     });
   }

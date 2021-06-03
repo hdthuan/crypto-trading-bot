@@ -70,6 +70,7 @@ const CandleExportHttp = require('../modules/system/candle_export_http');
 const CandleImporter = require('../modules/system/candle_importer');
 
 const OrdersHttp = require('../modules/orders/orders_http');
+const Reporting = require('./reporting');
 
 let db;
 let instances;
@@ -699,8 +700,15 @@ module.exports = {
       this.getLogsRepository(),
       this.getTickerLogRepository(),
       this.getExchangePositionWatcher(),
-      this.getPairStateManager(),
-      this.getClosedPositionRepository()
+      this.getPairStateManager()
+    );
+  },
+
+  createReportingInstance: function(){
+    return new Reporting(
+      this.getExchangeManager(),
+      this.getClosedPositionRepository(),
+      this.getLogger()
     );
   },
 
