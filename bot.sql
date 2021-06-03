@@ -71,6 +71,9 @@ CREATE TABLE IF NOT EXISTS signals (
   state      VARCHAR(50)  NULL
 );
 CREATE INDEX symbol_idx ON signals (exchange, symbol);
+CREATE INDEX signals_strategy_idx ON signals (strategy);
+CREATE INDEX signals_symbol_idx ON signals (symbol);
+CREATE INDEX signals_exchange_idx ON signals (exchange);
 
 CREATE TABLE IF NOT EXISTS logs (
   uuid       VARCHAR(64) PRIMARY KEY,

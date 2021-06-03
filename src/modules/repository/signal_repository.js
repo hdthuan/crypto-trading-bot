@@ -3,10 +3,17 @@ module.exports = class SignalRepository {
     this.db = db;
   }
 
-  getSignals(since) {
+  getSignals(since, exchange = null, symbol = null, strategy = null) {
     return new Promise(resolve => {
-      const stmt = this.db.prepare('SELECT * from signals where income_at > ? order by income_at DESC LIMIT 100');
-      resolve(stmt.all(since));
+      let exchangeQuery = !exchange ? '' : ' AND exchange = $exchange';
+      let symbolQuery = !symbol ? '' : ' AND symbol = $symbol';
+      let strategyQuery = !strategy ? '' : ' AND strategy = $strategy';
+      let sql = `SELECT * from signals where income_at > $since${exchangeQuery
+        }${symbolQuery
+        }${strategyQuery
+        } order by income_at DESC LIMIT 100`;
+      const stmt = this.db.prepare(sql);
+      resolve(stmt.all({ since, exchange, symbol, strategy }));
     });
   }
 
@@ -22,6 +29,27 @@ module.exports = class SignalRepository {
       side: side,
       strategy: strategy,
       income_at: Math.floor(Date.now() / 1000)
+    });
+  }
+
+  getAllExchanges(){
+    return new Promise(resolve => {
+      const stmt = this.db.prepare('SELECT exchange from signals GROUP BY exchange');
+      resolve(stmt.all().map(r => r.exchange));
+    });
+  }
+
+  getAllSymbols(){
+    return new Promise(resolve => {
+      const stmt = this.db.prepare('SELECT symbol from signals GROUP BY symbol');
+      resolve(stmt.all().map(r => r.symbol));
+    });
+  }
+
+  getAllStrategies(){
+    return new Promise(resolve => {
+      const stmt = this.db.prepare('SELECT strategy from signals GROUP BY strategy');
+      resolve(stmt.all().map(r => r.strategy));
     });
   }
 };

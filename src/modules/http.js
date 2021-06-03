@@ -39,7 +39,7 @@ module.exports = class Http {
   }
 
   start() {
-    twig.extendFilter('price_format', function(value) {
+    twig.extendFilter('price_format', function (value) {
       if (parseFloat(value) < 1) {
         return Intl.NumberFormat('en-US', {
           useGrouping: false,
@@ -60,29 +60,29 @@ module.exports = class Http {
       .update(String(Math.floor(Date.now() / 1000)))
       .digest('hex')
       .substring(0, 8);
-    twig.extendFunction('asset_version', function() {
+    twig.extendFunction('asset_version', function () {
       return assetVersion;
     });
 
     const desks = this.systemUtil.getConfig('desks', []).map(desk => desk.name);
-    twig.extendFunction('desks', function() {
+    twig.extendFunction('desks', function () {
       return desks;
     });
 
-    twig.extendFunction('node_version', function() {
+    twig.extendFunction('node_version', function () {
       return process.version;
     });
 
-    twig.extendFunction('memory_usage', function() {
+    twig.extendFunction('memory_usage', function () {
       return Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 100) / 100;
     });
 
     const up = new Date();
-    twig.extendFunction('uptime', function() {
+    twig.extendFunction('uptime', function () {
       return moment(up).toNow(true);
     });
 
-    twig.extendFilter('format_json', function(value) {
+    twig.extendFilter('format_json', function (value) {
       return JSON.stringify(value, null, '\t');
     });
 
@@ -141,19 +141,25 @@ module.exports = class Http {
       const asyncs = pairs.map(pair => {
         return async () => {
           const p = pair.split('.');
-
+          const backtestResult = await this.backtest.getBacktestResult(
+            parseInt(req.body.ticker_interval, 10),
+            req.body.hours,
+            req.body.strategy,
+            req.body.candle_period,
+            p[0],
+            p[1],
+            req.body.options ? JSON.parse(req.body.options) : {},
+            req.body.initial_capital,
+          );
+          backtestResult.real = await this.signalHttp.getSignals(
+            Math.floor(Date.now() / 1000) - 60 * 60 * req.body.hours,
+            p[0],
+            p[1],
+            req.body.strategy
+          )
           return {
             pair: pair,
-            result: await this.backtest.getBacktestResult(
-              parseInt(req.body.ticker_interval, 10),
-              req.body.hours,
-              req.body.strategy,
-              req.body.candle_period,
-              p[0],
-              p[1],
-              req.body.options ? JSON.parse(req.body.options) : {},
-              req.body.initial_capital
-            )
+            result: backtestResult
           };
         };
       });
@@ -180,7 +186,20 @@ module.exports = class Http {
 
     app.get('/signals', async (req, res) => {
       res.render('../templates/signals.html.twig', {
-        signals: await this.signalHttp.getSignals(Math.floor(Date.now() / 1000) - 60 * 60 * 48)
+        signals: await this.signalHttp.getSignals(
+          Math.floor(Date.now() / 1000) - 60 * 60 * 48,
+          req.query.exchange,
+          req.query.symbol,
+          req.query.strategy
+        ),
+        symbols: await this.signalHttp.getAllSymbols(),
+        exchanges: await this.signalHttp.getAllExchanges(),
+        strategies: await this.signalHttp.getAllStrategies(),
+        form: {
+          selectedExchange: req.query.exchange,
+          selectedSymbol: req.query.symbol,
+          selectedStrategy: req.query.strategy,
+        }
       });
     });
 

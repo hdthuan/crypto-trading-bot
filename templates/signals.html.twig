@@ -29,6 +29,44 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
+                            <div class="card-header">
+                                <strong>Filters</strong>
+                                <form method="get">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">Exchange:</li>
+                                        {% for key,exchange in exchanges %}
+                                            <li class="list-inline-item">
+                                                <div class="form-check">
+                                                    <input type="radio" id="exchange_{{ key }}" class="form-check-input" name="exchange" value="{{ exchange }}" onChange="this.form.submit()" {% if exchange == form.selectedExchange %}checked{% endif %}>
+                                                    <label class="form-check-label" for="exchange_{{ key }}">{{ exchange }}</label>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">Symbol:</li>
+                                        {% for key,symbol in symbols %}
+                                            <li class="list-inline-item">
+                                                <div class="form-check">
+                                                    <input type="radio" id="symbol_{{ key }}" class="form-check-input" name="symbol" value="{{ symbol }}" onChange="this.form.submit()" {% if symbol == form.selectedSymbol %}checked{% endif %}>
+                                                    <label class="form-check-label" for="symbol_{{ key }}">{{ symbol }}</label>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">Strategy:</li>
+                                        {% for key,strategy in strategies %}
+                                            <li class="list-inline-item">
+                                                <div class="form-check">
+                                                    <input type="radio" id="strategy_{{ key }}" class="form-check-input" name="strategy" value="{{ strategy }}" onChange="this.form.submit()" {% if strategy == form.selectedStrategy %}checked{% endif %}>
+                                                    <label class="form-check-label" for="strategy_{{ key }}">{{ strategy }}</label>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </form>
+                            </div>
                             <!-- /.card-header -->
                             <div class="card-body table-responsive p-0">
                                 <table class="table table-bordered table-sm table-hover">
