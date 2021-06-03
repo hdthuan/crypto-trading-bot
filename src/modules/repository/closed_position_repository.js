@@ -17,7 +17,7 @@ module.exports = class ClosedPositionRepository {
       amount: position.getAmount(),
       entry: position.getEntry(),
       profit: position.getProfit(),
-      createdAt: Math.floor(position.getCreatedAt().getTime() / 1000),
+      createdAt: Math.floor((position.getCreatedAt() || new Date()).getTime() / 1000),
       closedAt: Math.floor(new Date().getTime() / 1000),
     });
   }

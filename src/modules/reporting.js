@@ -48,12 +48,13 @@ module.exports = class Reporting {
 
         for (const [key, position] of Object.entries(me.positions)) {
           if (!currentOpen.includes(key)) {
-            delete me.positions[key];
             try {
+              me.logger.info(`position closed: ${JSON.stringify([position.getExchange(), position.getPosition()])}`)
               await me.closedPositionRepository.insertClosedPosition(position.getExchange(), position.getPosition())
             } catch (e) {
-              me.logger.error('insertClosedPosition' + String(e));
+              me.logger.error('insertClosedPosition: ' + String(e));
             }
+            delete me.positions[key];
           }
         }
       } catch (e) {
