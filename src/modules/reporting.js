@@ -30,27 +30,30 @@ module.exports = class Reporting {
         const positions = await me.exchangeManager.getPositions();
         if (!me.init) {
           positions.forEach(position => {
-            me.positions[position.getKey()] = position;
+            me.positions[position.getReportingKey()] = position;
           });
           me.init = true;
         }
         const currentOpen = [];
 
         for (const position of positions) {
-          const key = position.getKey();
+          const key = position.getReportingKey();
           currentOpen.push(key);
 
           if (!(key in me.positions)) {
             // new position
-            me.positions[position.getKey()] = position;
+            const currentPosition = me.positions[position.getReportingKey()]
+            me.positions[position.getReportingKey()] = { ...currentPosition, ...position };
           }
         }
 
         for (const [key, position] of Object.entries(me.positions)) {
           if (!currentOpen.includes(key)) {
             try {
-              me.logger.info(`position closed: ${JSON.stringify([position.getExchange(), position.getPosition()])}`)
-              await me.closedPositionRepository.insertClosedPosition(position.getExchange(), position.getPosition())
+              if (key !== "__UNSAFE__") {
+                me.logger.info(`position closed: ${JSON.stringify([position.getExchange(), position.getPosition()])}`)
+                await me.closedPositionRepository.insertClosedPosition(position.getExchange(), position.getPosition())
+              }
             } catch (e) {
               me.logger.error('insertClosedPosition: ' + String(e));
             }

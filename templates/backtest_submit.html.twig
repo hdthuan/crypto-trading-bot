@@ -94,7 +94,7 @@
                                     <tbody>
                                     {% for signal in real %}
                                         <tr>
-                                            <td>{{ signal.income_at|date('d.m.y H:i:s') }}</td>
+                                            <td>{{ signal.income_at|date('y-m-d H:i:s') }}</td>
                                             <td>
                                                 {% if signal.side == 'long' %}
                                                     <i class="fas fa-chevron-circle-up text-success"></i>
