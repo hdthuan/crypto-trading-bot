@@ -139,16 +139,6 @@ module.exports = class TickListener {
     if (!['close', 'short', 'long'].includes(signal)) {
       throw Error(`Invalid signal: ${JSON.stringify(signal, strategy)}`);
     }
-
-    const signalWindow = moment()
-      .subtract(_.get(symbol, 'trade.signal_slowdown_minutes', 15), 'minutes')
-      .toDate();
-
-    const noteKey = symbol.exchange + symbol.symbol;
-    if (noteKey in this.notified && this.notified[noteKey] >= signalWindow) {
-      return;
-    }
-
     // log signal
     this.logger.info(
       [new Date().toISOString(), signal, strategyKey, symbol.exchange, symbol.symbol, ticker.ask].join(' ')
@@ -165,6 +155,16 @@ module.exports = class TickListener {
       signal,
       strategyKey
     );
+
+    const signalWindow = moment()
+      .subtract(_.get(symbol, 'trade.signal_slowdown_minutes', 15), 'minutes')
+      .toDate();
+
+    const noteKey = symbol.exchange + symbol.symbol;
+    if (noteKey in this.notified && this.notified[noteKey] >= signalWindow) {
+      return;
+    }
+
     this.notified[noteKey] = new Date();
 
     await this.pairStateManager.update(symbol.exchange, symbol.symbol, signal);
