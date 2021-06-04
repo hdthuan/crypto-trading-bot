@@ -14,13 +14,6 @@ module.exports = class ExchangePosition {
     return this._exchange + this._position.symbol;
   }
 
-  getReportingKey() {
-    if (!this._position.entry) {
-      return "___UNSAFE___";
-    }
-    return this._exchange + this._position.symbol + this._position.entry;
-  }
-
   getExchange() {
     return this._exchange;
   }
