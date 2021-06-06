@@ -16,13 +16,9 @@ module.exports = class TrailingStopCalculator {
 
     let profit;
     if (position.side === 'long') {
-      if (ticker.bid < position.entry) {
-        profit = (ticker.bid / position.entry - 1) * 100;
-      }
+      profit = (ticker.bid / position.entry - 1) * 100;
     } else if (position.side === 'short') {
-      if (ticker.ask > position.entry) {
-        profit = (position.entry / ticker.ask - 1) * 100;
-      }
+      profit = (position.entry / ticker.ask - 1) * 100;
     } else {
       throw new Error(`Invalid side`);
     }
