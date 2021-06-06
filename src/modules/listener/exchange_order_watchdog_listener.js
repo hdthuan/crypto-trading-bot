@@ -26,7 +26,6 @@ module.exports = class ExchangeOrderWatchdogListener {
 
   onTick() {
     const { instances } = this;
-    this.trailingStopCalculator.persitTopProfitsAsync();
     this.exchangeManager.all().forEach(async exchange => {
       const positions = await exchange.getPositions();
 
@@ -76,7 +75,7 @@ module.exports = class ExchangeOrderWatchdogListener {
 
         const trailingStopWatch = pair.watchdogs.find(watchdog => watchdog.name === 'trailing_stop_version_2');
         if (trailingStopWatch) {
-          await this.trailingStopWatch(exchange, position, trailingStopWatch);
+          this.trailingStopWatch(exchange, position, trailingStopWatch);
         }
       });
     });
@@ -383,7 +382,7 @@ module.exports = class ExchangeOrderWatchdogListener {
       });
   }
 
-  async trailingStopWatch(exchange, position, config) {
+  trailingStopWatch(exchange, position, config) {
     this.logger.debug(`Trailing Stoploss Watcher: GO GO GO: ${JSON.stringify({
       exchange,
       position,
@@ -402,7 +401,7 @@ module.exports = class ExchangeOrderWatchdogListener {
     }
 
     if (typeof position.entry === 'undefined') {
-      this.logger.error(`Stoploss Watcher: no entry for position: ${JSON.stringify(position)}`);
+      this.logger.error(`Trailing Stoploss Watcher: no entry for position: ${JSON.stringify(position)}`);
       return;
     }
     const ticker = this.tickers.get(exchange.getName(), position.symbol);

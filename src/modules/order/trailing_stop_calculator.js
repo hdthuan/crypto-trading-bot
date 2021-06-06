@@ -37,7 +37,7 @@ module.exports = class TrailingStopCalculator {
       this.logger.debug(`TrailingStopCalculator: new profit top reached: ${exchangeSymbol} - ${profit}`);
 
       this.topProfits[exchangeSymbol] = profit;
-      // this.persitTopProfitsAsync();
+      this.persitTopProfitsAsync();
     }
     return profit;
   }
