@@ -383,11 +383,7 @@ module.exports = class ExchangeOrderWatchdogListener {
   }
 
   trailingStopWatch(exchange, position, config) {
-    this.logger.debug(`Trailing Stoploss Watcher: GO GO GO: ${JSON.stringify({
-      exchange,
-      position,
-      config
-    })}`)
+    this.logger.debug(`Trailing Stoploss Watcher: GO GO GO`)
     if (
       !config.target_percent ||
       config.target_percent < 0.1 ||
