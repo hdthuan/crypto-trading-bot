@@ -71,6 +71,7 @@ const CandleImporter = require('../modules/system/candle_importer');
 
 const OrdersHttp = require('../modules/orders/orders_http');
 const Reporting = require('./reporting');
+const TrailingStopCalculator = require('./order/trailing_stop_calculator');
 
 let db;
 let instances;
@@ -103,6 +104,7 @@ let strategyManager;
 
 let stopLossCalculator;
 let riskRewardRatioCalculator;
+let trailingStopCalculator;
 let pairsHttp;
 let orderExecutor;
 let orderCalculator;
@@ -196,6 +198,14 @@ module.exports = {
     return (riskRewardRatioCalculator = new RiskRewardRatioCalculator(this.getLogger()));
   },
 
+  getTrailingStopCalculator: function() {
+    if (trailingStopCalculator) {
+      return trailingStopCalculator;
+    }
+
+    return (trailingStopCalculator = new TrailingStopCalculator(this.getLogger()));
+  },
+
   getCandleImporter: function() {
     if (candleStickImporter) {
       return candleStickImporter;
@@ -242,6 +252,7 @@ module.exports = {
       this.getInstances(),
       this.getStopLossCalculator(),
       this.getRiskRewardRatioCalculator(),
+      this.getTrailingStopCalculator(),
       this.getOrderExecutor(),
       this.getPairStateManager(),
       this.getLogger(),

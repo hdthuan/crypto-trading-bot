@@ -7,6 +7,7 @@ module.exports = class ExchangeOrderWatchdogListener {
     instances,
     stopLossCalculator,
     riskRewardRatioCalculator,
+    trailingStopCalculator,
     orderExecutor,
     pairStateManager,
     logger,
@@ -20,11 +21,12 @@ module.exports = class ExchangeOrderWatchdogListener {
     this.pairStateManager = pairStateManager;
     this.logger = logger;
     this.tickers = tickers;
+    this.trailingStopCalculator = trailingStopCalculator;
   }
 
   onTick() {
     const { instances } = this;
-
+    this.trailingStopCalculator.persitTopProfitsAsync();
     this.exchangeManager.all().forEach(async exchange => {
       const positions = await exchange.getPositions();
 
@@ -70,6 +72,11 @@ module.exports = class ExchangeOrderWatchdogListener {
         const trailingStoplossWatch = pair.watchdogs.find(watchdog => watchdog.name === 'trailing_stop');
         if (trailingStoplossWatch) {
           await this.trailingStoplossWatch(exchange, position, trailingStoplossWatch);
+        }
+
+        const trailingStopWatch = pair.watchdogs.find(watchdog => watchdog.name === 'trailing_stop_version_2');
+        if (trailingStopWatch) {
+          await this.trailingStopWatch(exchange, position, trailingStopWatch);
         }
       });
     });
@@ -374,5 +381,48 @@ module.exports = class ExchangeOrderWatchdogListener {
       .catch(e => {
         logger.error(`Trailing stoploss create${JSON.stringify(e)}`);
       });
+  }
+
+  async trailingStopWatch(exchange, position, config) {
+    this.logger.debug(`Trailing Stoploss Watcher: GO GO GO: ${JSON.stringify({
+      exchange,
+      position,
+      config
+    })}`)
+    if (
+      !config.target_percent ||
+      config.target_percent < 0.1 ||
+      config.target_percent > 50 ||
+      !config.down_percent ||
+      config.down_percent < 0.1 ||
+      config.down_percent > 50
+    ) {
+      this.logger.error('Trailing Stoploss Watcher: invalid stop configuration need "0.1" - "50"');
+      return;
+    }
+
+    if (typeof position.entry === 'undefined') {
+      this.logger.error(`Stoploss Watcher: no entry for position: ${JSON.stringify(position)}`);
+      return;
+    }
+    const ticker = this.tickers.get(exchange.getName(), position.symbol);
+    const profit = this.trailingStopCalculator.collectPositionProfit(exchange, ticker, position)
+    const stopProfitOffset = this.trailingStopCalculator.calculateStopProfitOffset(exchange, position, config)
+    if (!stopProfitOffset) {
+      this.logger.debug("Trailing stop watch: Not reached target")
+      return;
+    }
+    if (profit > stopProfitOffset) {
+      this.logger.debug(`Trailing stop watch: No loss: stopProfitOffset: ${stopProfitOffset}`)
+      return;
+    }
+    this.logger.info(`Trailing stop watch: Close position due to trailing stop trigger: ${JSON.stringify({
+      exchange,
+      position,
+      profit,
+      stopProfitOffset
+    })}`)
+    this.trailingStopCalculator.cleanUpTopProfit(exchange, position);
+    this.pairStateManager.update(exchange.getName(), position.symbol, 'close');
   }
 };
