@@ -1,0 +1,2 @@
+# clone your top profits file
+cp temp/top-profits.json.dist temp/top-profits.json

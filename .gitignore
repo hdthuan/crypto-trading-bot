@@ -244,3 +244,4 @@ Temporary Items
 /bot.db
 /bot.db-shm
 /bot.db-wal
+/temp/top-profits.json
