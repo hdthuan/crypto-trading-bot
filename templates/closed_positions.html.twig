@@ -55,10 +55,10 @@
                                         <tr>
                                             <th scope="col">Exchange</th>
                                             <th scope="col">Symbol</th>
+                                            <th scope="col">Profit</th>
                                             <th scope="col">Side</th>
                                             <th scope="col">Amount</th>
                                             <th scope="col">Entry</th>
-                                            <th scope="col">Profit</th>
                                             <th scope="col">CreatedAt</th>
                                             <th scope="col">ClosedAt</th>
                                         </tr>
@@ -68,12 +68,12 @@
                                             <tr>
                                                 <td>{{closedPosition.exchange}}</td>
                                                 <td>{{closedPosition.symbol}}</td>
-                                                <td>{{closedPosition.side}}</td>
-                                                <td>{{closedPosition.amount|price_format}}</td>
-                                                <td>{{closedPosition.entry|price_format}}</td>
                                                 <td>
                                                     <span class="{{ closedPosition.profit >= 0 ? 'text-success' : 'text-danger' }}">{{ closedPosition.profit|round(2) }} %</span>
                                                 </td>
+                                                <td>{{closedPosition.side}}</td>
+                                                <td>{{closedPosition.amount|price_format}}</td>
+                                                <td>{{closedPosition.entry|price_format}}</td>
                                                 <td style="white-space: nowrap">{{ closedPosition.created_at|date('y-m-d H:i:s') }}</td>
                                                 <td style="white-space: nowrap">{{ closedPosition.closed_at|date('y-m-d H:i:s') }}</td>
                                             </tr>
