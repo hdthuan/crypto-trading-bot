@@ -11,6 +11,48 @@ module.exports = class Reporting {
     this.positions = {};
   }
 
+  storePosition(exchangePosition) {
+    if (!exchangePosition.getExchange() || !exchangePosition.getPosition()) {
+      return;
+    }
+    const key = exchangePosition.getKey()
+    const position = exchangePosition.getPosition();
+    const profit = position.getProfit()
+    const symbol = position.getSymbol();
+    const entry = position.getEntry();
+    const side = position.getSide();
+    const amount = position.getAmount();
+    const createdAt = position.getCreatedAt();
+    const updatedAt = position.getUpdatedAt();
+    let currentPosition = this.positions[key]
+    if (!currentPosition) {
+      currentPosition = {};
+      this.positions[key] = currentPosition;
+    }
+    currentPosition.exchange = exchangePosition.getExchange()
+    if (profit) {
+      currentPosition.profit = profit;
+    }
+    if (symbol) {
+      currentPosition.symbol = symbol;
+    }
+    if (entry) {
+      currentPosition.entry = entry;
+    }
+    if (createdAt) {
+      currentPosition.createdAt = createdAt;
+    }
+    if (updatedAt) {
+      currentPosition.updatedAt = updatedAt;
+    }
+    if (side) {
+      currentPosition.side = side;
+    }
+    if (amount) {
+      currentPosition.amount = amount;
+    }
+  }
+
   start() {
     this.logger.debug('Reporting module started');
 
@@ -30,7 +72,7 @@ module.exports = class Reporting {
         const positions = await me.exchangeManager.getPositions();
         if (!me.init) {
           positions.forEach(position => {
-            me.positions[position.getKey()] = position;
+            me.storePosition(position)
           });
           me.init = true;
         }
@@ -39,18 +81,17 @@ module.exports = class Reporting {
         for (const position of positions) {
           const key = position.getKey();
           currentOpen.push(key);
-
-          if (!(key in me.positions)) {
-            // new position
-            me.positions[position.getKey()] = position;
-          }
+          me.storePosition(position)
         }
 
         for (const [key, position] of Object.entries(me.positions)) {
           if (!currentOpen.includes(key)) {
             try {
-              me.logger.info(`position closed: ${JSON.stringify([position.getExchange(), position.getPosition()])}`)
-              await me.closedPositionRepository.insertClosedPosition(position.getExchange(), position.getPosition())
+              me.logger.info(`position closed: ${JSON.stringify(position)}`)
+              await me.closedPositionRepository.insertClosedPosition(
+                position.exchange,
+                position
+              )
             } catch (e) {
               me.logger.error('insertClosedPosition: ' + String(e));
             }

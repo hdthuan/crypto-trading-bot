@@ -12,12 +12,12 @@ module.exports = class ClosedPositionRepository {
 
     stmt.run({
       exchange: exchange,
-      symbol: position.getSymbol(),
-      side: position.getSide(),
-      amount: position.getAmount(),
-      entry: position.getEntry(),
-      profit: position.getProfit(),
-      createdAt: Math.floor((position.getCreatedAt() || new Date()).getTime() / 1000),
+      symbol: position.symbol,
+      side: position.side,
+      amount: position.amount,
+      entry: position.entry,
+      profit: position.profit,
+      createdAt: Math.floor(position.createdAt.getTime() / 1000),
       closedAt: Math.floor(new Date().getTime() / 1000),
     });
   }

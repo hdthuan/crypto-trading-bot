@@ -6,6 +6,6 @@ module.exports = class TradeCommand {
   execute() {
     services.createTradeInstance().start();
     services.createWebserverInstance().start();
-    // services.createReportingInstance().start();
+    services.createReportingInstance().start();
   }
 };
