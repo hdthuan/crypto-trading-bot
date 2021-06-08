@@ -13,8 +13,9 @@ module.exports = class TrailingStopCalculator {
     const me = this;
     this.eventEmitter.on('position.closed', (position) => {
       const positionIndicatorKey = me.getPositionIndicatorKey(position);
-      if (me.topProfits[positionIndicatorKey]) {
-        delete me.topProfits[positionIndicatorKey];
+      const symbol = `${position.exchange}_${positionIndicatorKey}`
+      if (me.topProfits[symbol]) {
+        delete me.topProfits[symbol];
         me.persitTopProfitsAsync();
       }
     })
