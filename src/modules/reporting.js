@@ -3,12 +3,14 @@ module.exports = class Reporting {
     exchangeManager,
     closedPositionRepository,
     logger,
+    eventEmitter
   ) {
     this.exchangeManager = exchangeManager;
     this.closedPositionRepository = closedPositionRepository;
     this.logger = logger;
     this.init = false
     this.positions = {};
+    this.eventEmitter = eventEmitter;
   }
 
   storePosition(exchangePosition) {
@@ -95,6 +97,7 @@ module.exports = class Reporting {
             } catch (e) {
               me.logger.error('insertClosedPosition: ' + String(e));
             }
+            me.eventEmitter.emit('position.closed', position)
             delete me.positions[key];
           }
         }

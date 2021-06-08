@@ -203,7 +203,7 @@ module.exports = {
       return trailingStopCalculator;
     }
 
-    return (trailingStopCalculator = new TrailingStopCalculator(this.getLogger()));
+    return (trailingStopCalculator = new TrailingStopCalculator(this.getLogger(), this.getEventEmitter()));
   },
 
   getCandleImporter: function() {
@@ -719,7 +719,8 @@ module.exports = {
     return new Reporting(
       this.getExchangeManager(),
       this.getClosedPositionRepository(),
-      this.getLogger()
+      this.getLogger(),
+      this.getEventEmitter()
     );
   },
 

@@ -21,7 +21,8 @@ module.exports = class Http {
     candleImporter,
     ordersHttp,
     tickers,
-    projectDir
+    projectDir,
+    trailingStopCalculator
   ) {
     this.systemUtil = systemUtil;
     this.ta = ta;
@@ -36,6 +37,7 @@ module.exports = class Http {
     this.projectDir = projectDir;
     this.tickers = tickers;
     this.closedPositionHttp = closedPositionHttp;
+    this.trailingStopCalculator = trailingStopCalculator;
   }
 
   start() {
@@ -416,7 +418,6 @@ module.exports = class Http {
         myPositions.forEach(position => {
           // simply converting of asset to currency value
           let currencyValue;
-          let currencyProfit;
 
           if (
             (exchangeName.includes('bitmex') && ['XBTUSD', 'ETHUSD'].includes(position.symbol)) ||
@@ -432,6 +433,7 @@ module.exports = class Http {
             exchange: exchangeName,
             position: position,
             currency: currencyValue,
+            topProfit: this.trailingStopCalculator.getTopProfitForPosition(position),
             currencyProfit: position.getProfit()
               ? currencyValue + (currencyValue / 100) * position.getProfit()
               : undefined

@@ -2,14 +2,31 @@ var fs = require("fs");
 const persitedTopProfits = require("../../../temp/top-profits.json");
 
 module.exports = class TrailingStopCalculator {
-  constructor(logger) {
+  constructor(
+    logger,
+    eventEmitter
+  ) {
     this.logger = logger;
     this.topProfits = persitedTopProfits
     this.logger.error(`TOP PROFITS: ${JSON.stringify(this.topProfits)}`)
+    this.eventEmitter = eventEmitter;
+    const me = this;
+    this.eventEmitter.on('position.closed', (position) => {
+      const positionIndicatorKey = me.getPositionIndicatorKey(position);
+      if (me.topProfits[positionIndicatorKey]) {
+        delete me.topProfits[positionIndicatorKey];
+        me.persitTopProfitsAsync();
+      }
+    })
   }
 
-  getPositionIndicatorKey(position){
+  getPositionIndicatorKey(position) {
     return `${position.symbol}_${position.side}_${position.entry}`;
+  }
+
+  getTopProfitForPosition(position){
+    const indicatorKey = this.getPositionIndicatorKey(position)
+    return this.topProfits[indicatorKey]
   }
 
   collectPositionProfit(exchange, ticker, position) {
