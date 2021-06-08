@@ -8,6 +8,10 @@ module.exports = class TrailingStopCalculator {
     this.logger.error(`TOP PROFITS: ${JSON.stringify(this.topProfits)}`)
   }
 
+  getPositionIndicatorKey(position){
+    return `${position.symbol}_${position.side}_${position.entry}`;
+  }
+
   collectPositionProfit(exchange, ticker, position) {
     if (!ticker) {
       this.logger.error(`TrailingStopCalculator: no ticker found ${JSON.stringify([exchange.getName(), position.symbol])}`);
@@ -27,7 +31,7 @@ module.exports = class TrailingStopCalculator {
       return profit;
     }
     this.logger.debug(`TrailingStopCalculator: currentProfit: ${profit}`);
-    const exchangeSymbol = `${exchange.getName()}_${position.symbol}`;
+    const exchangeSymbol = `${exchange.getName()}_${this.getPositionIndicatorKey(position)}`;
     const topProfit = this.topProfits[exchangeSymbol] || 0;
     if (profit > topProfit) {
       this.logger.debug(`TrailingStopCalculator: new profit top reached: ${exchangeSymbol} - ${profit}`);
@@ -40,7 +44,7 @@ module.exports = class TrailingStopCalculator {
 
   calculateStopProfitOffset(exchange, position, config) {
     const { target_percent, down_percent } = config;
-    const exchangeSymbol = `${exchange.getName()}_${position.symbol}`;
+    const exchangeSymbol = `${exchange.getName()}_${this.getPositionIndicatorKey(position)}`;
     const topProfit = this.topProfits[exchangeSymbol] || 0;
     this.logger.debug(`TrailingStopCalculator: currentTopProfit: ${topProfit}`);
     if (topProfit < target_percent) {
@@ -50,7 +54,7 @@ module.exports = class TrailingStopCalculator {
   }
 
   cleanUpTopProfit(exchange, position) {
-    const exchangeSymbol = `${exchange.getName()}_${position.symbol}`;
+    const exchangeSymbol = `${exchange.getName()}_${this.getPositionIndicatorKey(position)}`;
     delete this.topProfits[exchangeSymbol];
     this.persitTopProfitsAsync();
   }
