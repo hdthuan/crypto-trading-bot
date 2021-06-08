@@ -433,7 +433,7 @@ module.exports = class Http {
             exchange: exchangeName,
             position: position,
             currency: currencyValue,
-            topProfit: this.trailingStopCalculator.getTopProfitForPosition(position),
+            topProfit: this.trailingStopCalculator.getTopProfitForPosition(exchangeName, position),
             currencyProfit: position.getProfit()
               ? currencyValue + (currencyValue / 100) * position.getProfit()
               : undefined

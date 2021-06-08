@@ -24,9 +24,9 @@ module.exports = class TrailingStopCalculator {
     return `${position.symbol}_${position.side}_${position.entry}`;
   }
 
-  getTopProfitForPosition(position){
+  getTopProfitForPosition(exchange, position){
     const indicatorKey = this.getPositionIndicatorKey(position)
-    return this.topProfits[indicatorKey]
+    return this.topProfits[`${exchange}_${indicatorKey}`]
   }
 
   collectPositionProfit(exchange, ticker, position) {
