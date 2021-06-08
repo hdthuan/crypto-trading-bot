@@ -412,9 +412,9 @@ module.exports = class ExchangeOrderWatchdogListener {
       return;
     }
     this.logger.info(`Trailing stop watch: Close position due to trailing stop trigger: ${JSON.stringify({
-      exchange,
-      position,
-      profit,
+      exchange: exchange.getName(),
+      symbol: position.getSymbol(),
+      currentProfit: profit,
       stopProfitOffset
     })}`)
     this.trailingStopCalculator.cleanUpTopProfit(exchange, position);
