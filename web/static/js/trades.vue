@@ -69,7 +69,7 @@
                   >
                     {{ position.position.profit | round(2) }} %
                   </span>
-                  <span v-if="typeof position.topProfit !== 'underfined'"> {{ position.topProfit | round(2) }} % </span>
+                  <span v-if="typeof position.topProfit !== 'undefined'"> {{ position.topProfit | round(2) }} % </span>
                 </td>
                 <td>
                   <template v-if="!!position.position.entry">
