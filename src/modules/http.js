@@ -21,8 +21,8 @@ module.exports = class Http {
     candleImporter,
     ordersHttp,
     tickers,
-    projectDir,
-    trailingStopCalculator
+    trailingStopCalculator,
+    projectDir
   ) {
     this.systemUtil = systemUtil;
     this.ta = ta;
