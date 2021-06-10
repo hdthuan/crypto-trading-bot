@@ -44,7 +44,7 @@ module.exports = class BinanceMargin {
       opts.apiSecret = config.secret;
     }
 
-    this.totalCapital = opts.totalCapital;
+    this.totalCapital = config.totalCapital;
 
     const client = (this.client = BinanceClient(opts));
 
