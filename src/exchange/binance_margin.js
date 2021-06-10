@@ -466,6 +466,7 @@ module.exports = class BinanceMargin {
       this.logger.error(`Binance Margin: error sync orders: ${String(e)}`);
       return;
     }
+    this.logger.info(`Binance Margin: sync orders successfully. Count: ${openOrders.length}`);
 
     this.orderbag.set(Binance.createOrders(...openOrders));
   }
