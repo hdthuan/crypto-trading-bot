@@ -31,6 +31,7 @@ module.exports = class BinanceMargin {
     this.tickers = {};
     this.balances = [];
     this.orderbag = new OrderBag();
+    this.totalCapital = 0;
   }
 
   start(config, symbols) {
@@ -42,6 +43,8 @@ module.exports = class BinanceMargin {
       opts.apiKey = config.key;
       opts.apiSecret = config.secret;
     }
+
+    this.totalCapital = opts.totalCapital;
 
     const client = (this.client = BinanceClient(opts));
 
@@ -148,7 +151,18 @@ module.exports = class BinanceMargin {
     });
   }
 
+  async overTotalCapital(currency) {
+    const positions = await this.getPositions();
+    let totalCurrentCapital = positions.reduce((a, b) => {
+      return a + b.entry * b.amount
+    }, 0)
+    return totalCurrentCapital + currency > this.totalCapital
+  }
+
   async order(order) {
+    if (await this.overTotalCapital(order.amount * order.price)) {
+      return ExchangeOrder.createRejectedFromOrder(order, `OVER TOTAL CAPITALS`);
+    }
     order.amount = this.calculateAmount(order.amount, order.symbol)
     const payload = Binance.createOrderBody(order);
 
