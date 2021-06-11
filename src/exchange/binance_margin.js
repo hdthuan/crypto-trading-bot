@@ -160,9 +160,6 @@ module.exports = class BinanceMargin {
   }
 
   async order(order) {
-    if (await this.overTotalCapital(order.amount * order.price)) {
-      return ExchangeOrder.createRejectedFromOrder(order, `OVER TOTAL CAPITALS`);
-    }
     order.amount = this.calculateAmount(order.amount, order.symbol)
     const payload = Binance.createOrderBody(order);
 
@@ -181,6 +178,11 @@ module.exports = class BinanceMargin {
       // repay: close position
       if ((order.isLong() && position.isShort()) || (order.isShort() && position.isLong())) {
         payload.sideEffectType = 'AUTO_REPAY';
+      }
+    }
+    if (payload.sideEffectType !== 'AUTO_REPAY') {
+      if (await this.overTotalCapital(order.amount * order.price)) {
+        return ExchangeOrder.createRejectedFromOrder(order, `OVER TOTAL CAPITALS`);
       }
     }
 
