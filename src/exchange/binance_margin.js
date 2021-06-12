@@ -364,11 +364,11 @@ module.exports = class BinanceMargin {
         // calculate profit based on the ticker price
         let profit;
         if (entry && this.tickers[pair]) {
-          profit = (this.tickers[pair].bid / entry - 1) * 100;
-
-          // inverse profit for short
-          if (side === 'short') {
-            profit *= -1;
+          const ticker = this.tickers[pair]
+          if (side === 'long') {
+            profit = (ticker.bid / entry - 1) * 100;
+          } else if (side === 'short') {
+            profit = (entry / ticker.ask - 1) * 100;
           }
         }
 
