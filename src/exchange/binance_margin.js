@@ -59,7 +59,7 @@ module.exports = class BinanceMargin {
       // also sync by time
       setTimeout(async () => {
         await me.syncPairInfo();
-        await me.syncBalances();
+        await me.syncBalances(true);
         await me.syncOrders();
 
         // positions needs a ticker price; which needs a websocket event
@@ -473,10 +473,11 @@ module.exports = class BinanceMargin {
     this.orderbag.set(Binance.createOrders(...openOrders));
   }
 
-  async syncBalances() {
+  async syncBalances(firstSync) {
+    this.logger.debug('Binance Margin: Sync balances');
     let accountInfo;
     try {
-      accountInfo = await this.client.marginAccountInfo();
+      accountInfo = firstSync ? await this.client.marginAccountInfo({ recvWindow: 20000 }) : await this.client.marginAccountInfo();
     } catch (e) {
       this.logger.error(`Binance Margin: error sync balances: ${String(e)}`);
       return;
@@ -487,7 +488,7 @@ module.exports = class BinanceMargin {
       return;
     }
 
-    this.logger.debug('Binance Margin: Sync balances');
+    this.logger.debug('Binance Margin: Sync balances successfully!');
 
     this.balances = BinanceMargin.createMarginBalances(accountInfo.userAssets);
   }
