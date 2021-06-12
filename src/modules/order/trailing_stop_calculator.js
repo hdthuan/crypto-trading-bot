@@ -8,7 +8,7 @@ module.exports = class TrailingStopCalculator {
   ) {
     this.logger = logger;
     this.topProfits = persitedTopProfits
-    this.logger.error(`TOP PROFITS: ${JSON.stringify(this.topProfits)}`)
+    this.logger.info(`TOP PROFITS: ${JSON.stringify(this.topProfits)}`)
     this.eventEmitter = eventEmitter;
     const me = this;
     this.eventEmitter.on('position.closed', (position) => {
