@@ -463,7 +463,7 @@ module.exports = class BinanceMargin {
     // false equal to all symbols
     let openOrders = [];
     try {
-      openOrders = await this.client.marginOpenOrders(false);
+      openOrders = await this.client.marginOpenOrders({ useServerTime: true });
     } catch (e) {
       this.logger.error(`Binance Margin: error sync orders: ${String(e)}`);
       return;
