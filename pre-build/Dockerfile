@@ -9,7 +9,7 @@ WORKDIR /usr/src/app
 
 # Install app dependencies
 COPY . /usr/src/app
-RUN npm install --production
+RUN npm install
 
 # Apply all patches in app
 RUN npm run postinstall
