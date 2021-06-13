@@ -1,4 +1,4 @@
-FROM hdthuan/crypto-bot-pre-build:1
+FROM hdthuan/crypto-bot-pre-build:2
 # Install build-essential, sqlite in order
 WORKDIR /usr/src/app
 
