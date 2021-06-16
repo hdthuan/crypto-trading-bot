@@ -68,7 +68,7 @@ module.exports = class TrailingStopCalculator {
     if (topProfit < target_percent) {
       return;
     }
-    return topProfit - down_percent;
+    return topProfit * (1 - down_percent);
   }
 
   cleanUpTopProfit(exchange, position) {
