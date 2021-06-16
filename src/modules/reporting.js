@@ -34,6 +34,7 @@ module.exports = class Reporting {
     currentPosition.exchange = exchangePosition.getExchange()
     if (profit) {
       currentPosition.profit = profit;
+      this.eventEmitter.emit('position.profit.changed', position)
     }
     if (symbol) {
       currentPosition.symbol = symbol;

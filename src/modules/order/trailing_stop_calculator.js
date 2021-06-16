@@ -19,35 +19,30 @@ module.exports = class TrailingStopCalculator {
         me.persitTopProfitsAsync();
       }
     })
+    this.eventEmitter.on('position.profit.changed', (position) => {
+      const positionIndicatorKey = me.getPositionIndicatorKey(position);
+      const exchangeSymbol = `${position.exchange}_${positionIndicatorKey}`
+      const topProfit = this.topProfits[exchangeSymbol] || 0;
+      const profit = position.profit;
+      if (profit > topProfit) {
+        this.logger.debug(`TrailingStopCalculator: new profit top reached: ${exchangeSymbol} - ${profit}`);
+        this.topProfits[exchangeSymbol] = profit;
+        this.persitTopProfitsAsync();
+      }
+    })
   }
 
   getPositionIndicatorKey(position) {
     return `${position.symbol}_${position.side}_${position.entry}`;
   }
 
-  getTopProfitForPosition(exchange, position){
+  getTopProfitForPosition(exchange, position) {
     const indicatorKey = this.getPositionIndicatorKey(position)
     return this.topProfits[`${exchange}_${indicatorKey}`]
   }
 
   collectPositionProfit(exchange, ticker, position) {
-    if (!ticker) {
-      this.logger.error(`TrailingStopCalculator: no ticker found ${JSON.stringify([exchange.getName(), position.symbol])}`);
-      return;
-    }
-
-    let profit;
-    if (position.side === 'long') {
-      profit = (ticker.bid / position.entry - 1) * 100;
-    } else if (position.side === 'short') {
-      profit = (position.entry / ticker.ask - 1) * 100;
-    } else {
-      throw new Error(`Invalid side`);
-    }
-
-    if (typeof profit === 'undefined' || profit < 0) {
-      return profit;
-    }
+    const profit = position.profit;
     this.logger.debug(`TrailingStopCalculator: currentProfit: ${profit}`);
     const exchangeSymbol = `${exchange.getName()}_${this.getPositionIndicatorKey(position)}`;
     const topProfit = this.topProfits[exchangeSymbol] || 0;
