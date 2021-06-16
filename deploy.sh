@@ -1,2 +1,2 @@
 #!/bin/bash
-git pull && docker-compose buil && docker-compose up -d
+git pull && docker-compose build && docker-compose up -d
