@@ -43,6 +43,15 @@ module.exports = class CcxtExchangeOrder {
       case Order.TYPE_MARKET:
         promise = this.ccxtClient.createOrder(order.getSymbol(), order.getType(), side, order.getAmount());
         break;
+      case Order.TYPE_TRAILING_STOP:
+        promise = this.ccxtClient.createOrder(
+          order.getSymbol(),
+          "trailing_stop_market",
+          side, order.getAmount(),
+          order.getPrice(),
+          parameters.args
+        );
+        break;
       default:
         throw `Ccxt order converter unsupported order type:${order.getType()}`;
     }

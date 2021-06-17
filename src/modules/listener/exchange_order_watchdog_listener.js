@@ -77,6 +77,11 @@ module.exports = class ExchangeOrderWatchdogListener {
         if (trailingStopWatch) {
           this.trailingStopWatch(exchange, position, trailingStopWatch);
         }
+
+        const trailingStopMarketWatch = pair.watchdogs.find(watchdog => watchdog.name === 'trailing_stop_market');
+        if (this.trailingStopMarketWatch) {
+          this.trailingStopMarketWatch(exchange, position, trailingStopMarketWatch)
+        }
       });
     });
   }
@@ -419,5 +424,71 @@ module.exports = class ExchangeOrderWatchdogListener {
     })}`)
     this.trailingStopCalculator.cleanUpTopProfit(exchange, position);
     this.pairStateManager.update(exchange.getName(), position.symbol, 'close');
+  }
+
+
+  async trailingStopMarketWatch(exchange, position, config) {
+    const { logger, stopLossCalculator } = this;
+
+    if (
+      !config.target_percent ||
+      config.target_percent < 0.1 ||
+      config.target_percent > 50 ||
+      !config.callback_rate ||
+      config.callback_rate < 0.1 ||
+      config.callback_rate > 50
+    ) {
+      this.logger.error('Trailing Stop Market Watcher: invalid stop configuration need "0.1" - "50"');
+      return;
+    }
+
+    if (typeof position.entry === 'undefined') {
+      this.logger.error(`Trailing Stop Market Watcher: no entry for position: ${JSON.stringify(position)}`);
+      return;
+    }
+
+    const orders = await exchange.getOrdersForSymbol(position.symbol);
+    const orderChanges = orderUtil.syncTrailingStopMarketOrder(position, orders);
+    await Promise.all(
+      orderChanges.map(async orderChange => {
+        if (orderChange.id) {
+          // update
+
+          let amount = Math.abs(orderChange.amount);
+          if (position.isLong()) {
+            amount *= -1;
+          }
+
+          return exchange.updateOrder(orderChange.id, Order.createUpdateOrder(orderChange.id, undefined, amount));
+        }
+
+        const targetPercent = config.target_percent
+        let price;
+        if (position.side === 'long') {
+          price = position.entry * (1 - targetPercent / 100);
+        } else {
+          price = position.entry * (1 + targetPercent / 100);
+        }
+
+        // inverse price for lose long position via sell
+        if (position.side === 'long') {
+          price *= -1;
+        }
+        const order = Order.createTrailingStopMarketOrder(position.symbol, price, orderChange.amount, config.callback_rate);
+
+        return exchange.order(order);
+      })
+    )
+      .then(results => {
+        logger.info(
+          `Trailing stop market: ${JSON.stringify({
+            results: results,
+            exchange: exchange.getName()
+          })}`
+        );
+      })
+      .catch(e => {
+        logger.error(`Trailing stoploss market create${JSON.stringify(e)}`);
+      });
   }
 };

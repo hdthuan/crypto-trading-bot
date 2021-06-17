@@ -347,7 +347,7 @@ module.exports = class BinanceFutures {
     const me = this;
     const ws = new WebSocket('wss://fstream.binance.com/stream');
 
-    ws.onerror = function(event) {
+    ws.onerror = function (event) {
       me.logger.error(
         `Binance Futures: Public stream (${indexConnection}) error: ${JSON.stringify([event.code, event.message])}`
       );
@@ -355,7 +355,7 @@ module.exports = class BinanceFutures {
 
     let subscriptionTimeouts = {};
 
-    ws.onopen = function() {
+    ws.onopen = function () {
       me.logger.info(`Binance Futures: Public stream (${indexConnection}) opened.`);
 
       me.logger.info(
@@ -382,7 +382,7 @@ module.exports = class BinanceFutures {
       });
     };
 
-    ws.onmessage = async function(event) {
+    ws.onmessage = async function (event) {
       if (event.type && event.type === 'message') {
         const body = JSON.parse(event.data);
 
@@ -419,7 +419,7 @@ module.exports = class BinanceFutures {
       }
     };
 
-    ws.onclose = function(event) {
+    ws.onclose = function (event) {
       me.logger.error(
         `Binance Futures: Public Stream (${indexConnection}) connection closed: ${JSON.stringify([
           event.code,
@@ -456,15 +456,15 @@ module.exports = class BinanceFutures {
 
     const me = this;
     const ws = new WebSocket(`wss://fstream.binance.com/ws/${response.listenKey}`);
-    ws.onerror = function(e) {
+    ws.onerror = function (e) {
       me.logger.info(`Binance Futures: Connection error: ${String(e)}`);
     };
 
-    ws.onopen = function() {
+    ws.onopen = function () {
       me.logger.info(`Binance Futures: Opened user stream`);
     };
 
-    ws.onmessage = async function(event) {
+    ws.onmessage = async function (event) {
       if (event && event.type === 'message') {
         const message = JSON.parse(event.data);
 
@@ -499,7 +499,7 @@ module.exports = class BinanceFutures {
       }
     }, 1000 * 60 * 10);
 
-    ws.onclose = function(event) {
+    ws.onclose = function (event) {
       me.logger.error(`Binance futures: User stream connection closed: ${JSON.stringify([event.code, event.message])}`);
       clearInterval(heartbeat);
 
@@ -544,6 +544,10 @@ module.exports = class BinanceFutures {
 
         if (order.getType() === Order.TYPE_STOP) {
           request.args.stopPrice = order.getPrice();
+        }
+
+        if (order.getType() === Order.TYPE_TRAILING_STOP) {
+          request.args.callbackRate = order.getCallbackRate();
         }
 
         return request;

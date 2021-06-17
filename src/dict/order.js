@@ -86,6 +86,10 @@ module.exports = class Order {
     return this.options && this.options.close === true;
   }
 
+  getCallbackRate() {
+    return this.options && this.options.callbackRate;
+  }
+
   static createMarketOrder(symbol, amount) {
     return new Order(
       Math.round(new Date().getTime().toString() * Math.random()),
@@ -266,6 +270,18 @@ module.exports = class Order {
       amount,
       this.TYPE_TRAILING_STOP,
       { close: true }
+    );
+  }
+
+  static createTrailingStopMarketOrder(symbol, price, amount, callbackRate) {
+    return new Order(
+      Math.round(new Date().getTime().toString() * Math.random()),
+      symbol,
+      price < 0 ? Order.SIDE_SHORT : Order.SIDE_LONG,
+      price,
+      amount,
+      this.TYPE_TRAILING_STOP,
+      { callbackRate }
     );
   }
 };

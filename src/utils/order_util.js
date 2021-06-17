@@ -38,6 +38,10 @@ module.exports = {
     return module.exports.syncOrderByType(position, orders, ExchangeOrder.TYPE_TRAILING_STOP);
   },
 
+  syncTrailingStopMarketOrder: (position, orders) => {
+    return module.exports.syncOrderByType(position, orders, ExchangeOrder.TYPE_TRAILING_STOP)
+  },
+
   /**
    * LTC: "0.008195" => "0.00820"
    *
