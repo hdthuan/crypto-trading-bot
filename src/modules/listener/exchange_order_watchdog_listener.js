@@ -465,9 +465,9 @@ module.exports = class ExchangeOrderWatchdogListener {
         const targetPercent = config.target_percent
         let price;
         if (position.side === 'long') {
-          price = position.entry * (1 - targetPercent / 100);
-        } else {
           price = position.entry * (1 + targetPercent / 100);
+        } else {
+          price = position.entry * (1 - targetPercent / 100);
         }
 
         // inverse price for lose long position via sell
