@@ -587,7 +587,8 @@ module.exports = class BinanceFutures {
       X: 'status',
       i: 'orderId',
       T: 'updateTime',
-      z: 'executedQty'
+      z: 'executedQty',
+      AP: 'activationPrice',
       // n: 'cumQuote' // not fully sure about commision
     };
 
@@ -597,6 +598,10 @@ module.exports = class BinanceFutures {
         newOrder[map[k]] = order[k];
       }
     });
+    if (newOrder.activationPrice) {
+      newOrder.price = newOrder.activationPrice;
+      delete newOrder.activationPrice;
+    }
 
     return newOrder;
   }
