@@ -463,18 +463,18 @@ module.exports = class ExchangeOrderWatchdogListener {
         }
 
         const targetPercent = config.target_percent
-        let price;
+        let activationPrice;
         if (position.side === 'long') {
-          price = position.entry * (1 + targetPercent / 100);
+          activationPrice = position.entry * (1 + targetPercent / 100);
         } else {
-          price = position.entry * (1 - targetPercent / 100);
+          activationPrice = position.entry * (1 - targetPercent / 100);
         }
 
-        // inverse price for lose long position via sell
+        // inverse activationPrice for lose long position via sell
         if (position.side === 'long') {
-          price *= -1;
+          activationPrice *= -1;
         }
-        const order = Order.createTrailingStopMarketOrder(position.symbol, price, orderChange.amount, config.callback_rate);
+        const order = Order.createTrailingStopMarketOrder(position.symbol, activationPrice, orderChange.amount, config.callback_rate);
 
         return exchange.order(order);
       })

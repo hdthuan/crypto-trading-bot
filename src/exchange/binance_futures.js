@@ -548,6 +548,7 @@ module.exports = class BinanceFutures {
 
         if (order.getType() === Order.TYPE_TRAILING_STOP) {
           request.args.callbackRate = order.getCallbackRate();
+          request.args.activatePrice = order.getPrice();
         }
 
         return request;
