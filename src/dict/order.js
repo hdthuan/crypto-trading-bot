@@ -281,7 +281,7 @@ module.exports = class Order {
       price,
       amount,
       this.TYPE_TRAILING_STOP,
-      { callbackRate, activatePrice: price }
+      { callbackRate, activationPrice: price }
     );
   }
 };
