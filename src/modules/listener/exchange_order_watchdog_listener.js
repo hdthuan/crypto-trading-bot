@@ -79,7 +79,7 @@ module.exports = class ExchangeOrderWatchdogListener {
         }
 
         const trailingStopMarketWatch = pair.watchdogs.find(watchdog => watchdog.name === 'trailing_stop_market');
-        if (this.trailingStopMarketWatch) {
+        if (trailingStopMarketWatch) {
           this.trailingStopMarketWatch(exchange, position, trailingStopMarketWatch)
         }
       });
