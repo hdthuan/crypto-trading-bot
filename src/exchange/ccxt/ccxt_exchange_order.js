@@ -73,12 +73,16 @@ module.exports = class CcxtExchangeOrder {
   }
 
   async syncOrders() {
-    const symbolStrings = this.symbols.map(r=>r.symbol.replace("USDT", "/USDT"))
-    const syncTasks = symbolStrings.map(async r => await this.syncOrdersForSymbol(r))
-    const allResults = await Promise.all(syncTasks)
-    const allOrders = allResults.reduce((a, b) => [...a, ...b])
-    this.orderbag.set(allOrders);
-    return allOrders;
+    try {
+      const symbolStrings = this.symbols.map(r => r.symbol.replace("USDT", "/USDT"))
+      const syncTasks = symbolStrings.map(async r => await this.syncOrdersForSymbol(r))
+      const allResults = await Promise.all(syncTasks)
+      const allOrders = allResults.reduce((a, b) => [...a, ...b])
+      this.orderbag.set(allOrders);
+      return allOrders;
+    } catch {
+      return undefined;
+    }
   }
 
   async syncOrdersForSymbol(symbol) {
@@ -87,7 +91,7 @@ module.exports = class CcxtExchangeOrder {
       orders = await this.ccxtClient.fetchOpenOrders(symbol);
     } catch (e) {
       this.logger.error(`SyncOrder timeout: ${String(e)}`);
-      return [];
+      throw e
     }
 
     if (this.callbacks && 'convertOrder' in this.callbacks) {
@@ -104,7 +108,7 @@ module.exports = class CcxtExchangeOrder {
         custom = await this.callbacks.syncOrders(this.ccxtClient);
       } catch (e) {
         this.logger.error(`SyncOrder callback error: ${String(e)}`);
-        return [];
+        throw e
       }
 
       if (custom) {
