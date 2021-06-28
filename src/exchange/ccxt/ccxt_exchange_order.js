@@ -78,6 +78,7 @@ module.exports = class CcxtExchangeOrder {
       const syncTasks = symbolStrings.map(async r => await this.syncOrdersForSymbol(r))
       const allResults = await Promise.all(syncTasks)
       const allOrders = allResults.reduce((a, b) => [...a, ...b])
+      this.logger.info(`SYNC ORDERS OK: ${JSON.stringify(allOrders)}`)
       this.orderbag.set(allOrders);
       return allOrders;
     } catch {
@@ -85,10 +86,22 @@ module.exports = class CcxtExchangeOrder {
     }
   }
 
+  async syncOrdersForSymbolRetriable(symbol, retried = 0) {
+    try {
+      return await this.ccxtClient.fetchOpenOrders(symbol);
+    } catch (e) {
+      this.logger.error(`SyncOrder timeout: ${String(e)}`);
+      if (retried >= 5) {
+        throw e
+      }
+      return await this.syncOrdersForSymbolRetriable(symbol, retried + 1)
+    }
+  }
+
   async syncOrdersForSymbol(symbol) {
     let orders;
     try {
-      orders = await this.ccxtClient.fetchOpenOrders(symbol);
+      orders = await this.syncOrdersForSymbolRetriable(symbol);
     } catch (e) {
       this.logger.error(`SyncOrder timeout: ${String(e)}`);
       throw e

@@ -451,6 +451,7 @@ module.exports = class ExchangeOrderWatchdogListener {
     const orderChanges = orderUtil.syncTrailingStopMarketOrder(position, orders);
     await Promise.all(
       orderChanges.map(async orderChange => {
+        this.logger.error(`ALO ALO: ${JSON.stringify(orderChange)}`)
         if (orderChange.id) {
           // update
 
