@@ -172,7 +172,13 @@ module.exports = class BinanceFutures {
   }
 
   async order(order) {
-    return this.ccxtExchangeOrder.createOrder(order);
+    const startTime = new Date();
+    const result = await this.ccxtExchangeOrder.createOrder(order);
+    const endTime = new Date();
+    this.logger.info(`binance_future:order: success: ${JSON.stringify({
+      startTime, endTime, duration: endTime.getTime() - startTime.getTime()
+    })}`)
+    return result;
   }
 
   async cancelOrder(id) {
