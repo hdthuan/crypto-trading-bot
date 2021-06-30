@@ -73,6 +73,24 @@ module.exports = class CcxtExchangeOrder {
   }
 
   async syncOrders() {
+    var useAll = true;
+    if (useAll) {
+      return await this.syncOrdersAll();
+    } else {
+      return await this.syncOrdersEach();
+    }
+  }
+
+  async syncOrdersAll() {
+    try {
+      return await this.ccxtClient.fetchOpenOrders();
+    } catch (e) {
+      this.logger.error(`SyncOrder timeout: ${String(e)}`);
+      return undefined;
+    }
+  }
+
+  async syncOrdersEach() {
     try {
       const symbolStrings = this.symbols.map(r => r.symbol.replace("USDT", "/USDT"))
       const syncTasks = symbolStrings.map(async r => await this.syncOrdersForSymbol(r))
