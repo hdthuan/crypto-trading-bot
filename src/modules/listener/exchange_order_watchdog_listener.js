@@ -481,7 +481,7 @@ module.exports = class ExchangeOrderWatchdogListener {
       })
     )
       .then(results => {
-        logger.info(
+        logger.debug(
           `Trailing stop market: ${JSON.stringify({
             results: results,
             exchange: exchange.getName()

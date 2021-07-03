@@ -111,7 +111,7 @@ module.exports = class CcxtExchangeOrder {
         result.push(...custom);
       }
     }
-    this.logger.info(`SYNC ORDERS OK: ${result.length}`)
+    this.logger.debug(`SYNC ORDERS OK: ${result.length}`)
     this.orderbag.set(result);
     return result;
   }
@@ -122,7 +122,7 @@ module.exports = class CcxtExchangeOrder {
       const syncTasks = symbolStrings.map(async r => await this.syncOrdersForSymbol(r))
       const allResults = await Promise.all(syncTasks)
       const allOrders = allResults.reduce((a, b) => [...a, ...b])
-      this.logger.info(`SYNC ORDERS OK: ${JSON.stringify(allOrders)}`)
+      this.logger.debug(`SYNC ORDERS OK: ${JSON.stringify(allOrders)}`)
       this.orderbag.set(allOrders);
       return allOrders;
     } catch {
