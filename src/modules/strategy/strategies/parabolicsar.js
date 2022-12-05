@@ -80,8 +80,6 @@ module.exports = class PARABOL {
             period: '15m',
             high: [],
             low: [],
-            step: step,
-            max: max
         };
     }
 };
