@@ -163,10 +163,12 @@ module.exports = class ExchangeOrderWatchdogListener {
       try {
         await exchange.order(order);
       } catch (e) {
+        const messageError = e ? e.message : 'unknown';
         logger.error(
           `Stoploss create${JSON.stringify({
             error: e,
-            order: order
+            order: order,
+            messageError
           })}`
         );
       }
